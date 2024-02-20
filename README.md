@@ -1,6 +1,3 @@
-# spotify-playlist-parser
-
-
 # Spotify Playlist Parser 🎵
 
 This project provides a Python script that parses XML files containing music library information (such as those exported from iTunes) and creates corresponding playlists in Spotify, automatically populating them with available tracks found on Spotify.
