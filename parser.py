@@ -22,16 +22,16 @@ SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
 SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
 USERNAME = os.getenv('USERNAME')
 
-
-def authenticate_spotify():
-    token = util.prompt_for_user_token(
-        USERNAME,
-        scope='playlist-modify-public playlist-modify-private',
+def authenticate_spotify_updated():
+    sp_oauth = SpotifyOAuth(
         client_id=SPOTIPY_CLIENT_ID,
         client_secret=SPOTIPY_CLIENT_SECRET,
-        redirect_uri=SPOTIPY_REDIRECT_URI
+        redirect_uri=SPOTIPY_REDIRECT_URI,
+        scope="playlist-read-private playlist-read-collaborative playlist-modify-public playlist-modify-private",
+        cache_path=".cache-{}".format(USERNAME)  # Ensures token info is saved
     )
-    return spotipy.Spotify(auth=token)
+    sp = spotipy.Spotify(auth_manager=sp_oauth)
+    return sp
 
 
 def create_playlists(xml_file_path, track_id_name_dict):
@@ -93,18 +93,21 @@ def search_spotify_and_add(playlists_with_artists):
         SPOTIPY_CLIENT_ID,
         SPOTIPY_CLIENT_SECRET,
         SPOTIPY_REDIRECT_URI,
-        scope = 'playlist-modify-public playlist-modify-private'
+        scope = 'playlist-modify-public playlist-modify-private playlist-read-private playlist-read-collaborative'
     )
 
     auth_url = sp_oauth.get_authorize_url()
     print(auth_url)
     
-    sp = authenticate_spotify()
+    # sp = authenticate_spotify()
+    sp = authenticate_spotify_updated()
+
     not_found_tracks = []  # To keep track of songs not found on Spotify
     
     # Fetch existing playlists to check for duplicates
     existing_playlists = sp.current_user_playlists()
     existing_playlist_names = [playlist['name'] for playlist in existing_playlists['items']]
+
 
     for playlist_name, tracks in playlists_with_artists.items():
         
@@ -112,7 +115,9 @@ def search_spotify_and_add(playlists_with_artists):
         if playlist_name in existing_playlist_names:
             print(f"Playlist '{playlist_name}' already exists. Skipping creation.")
             continue  # Skip to the next playlist
-            
+        
+        if playlist_name == "Library": 
+            continue  # Skip to the next playlist
             
         # Create a new Spotify playlist for each playlist in the dictionary, make it private and add a description
         sp_playlist = sp.user_playlist_create(USERNAME, playlist_name, public=False, description="Sam Fearn copyrighted")
@@ -221,6 +226,7 @@ def create_playlists_with_artists(xml_file_path, track_id_name_artist_dict):
     print(f"Created {len(playlists)} playlists with songs and artists.")
 
     return playlists
+    
 
 def main():
 
