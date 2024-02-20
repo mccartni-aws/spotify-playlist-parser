@@ -1,0 +1,5 @@
+spotipy>=2.19.0
+xmltodict>=0.12.0
+tqdm>=4.62.0
+lxml>=4.6.3
+python-dotenv>=0.19.2
