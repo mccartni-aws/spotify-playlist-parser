@@ -22,7 +22,7 @@ SPOTIPY_CLIENT_SECRET = os.getenv('SPOTIPY_CLIENT_SECRET')
 SPOTIPY_REDIRECT_URI = os.getenv('SPOTIPY_REDIRECT_URI')
 USERNAME = os.getenv('USERNAME')
 
-def authenticate_spotify_updated():
+def authenticate_spotify():
     sp_oauth = SpotifyOAuth(
         client_id=SPOTIPY_CLIENT_ID,
         client_secret=SPOTIPY_CLIENT_SECRET,
@@ -99,8 +99,7 @@ def search_spotify_and_add(playlists_with_artists):
     auth_url = sp_oauth.get_authorize_url()
     print(auth_url)
     
-    # sp = authenticate_spotify()
-    sp = authenticate_spotify_updated()
+    sp = authenticate_spotify()
 
     not_found_tracks = []  # To keep track of songs not found on Spotify
     
@@ -114,9 +113,6 @@ def search_spotify_and_add(playlists_with_artists):
         # Check if the playlist already exists
         if playlist_name in existing_playlist_names:
             print(f"Playlist '{playlist_name}' already exists. Skipping creation.")
-            continue  # Skip to the next playlist
-        
-        if playlist_name == "Library": 
             continue  # Skip to the next playlist
             
         # Create a new Spotify playlist for each playlist in the dictionary, make it private and add a description
